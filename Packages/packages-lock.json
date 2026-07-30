@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.daniel-geo.unityhackatime": {
+      "version": "https://github.com/daniel-geo/unity-hackatime.git#package",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "5ac210a9a287428cb876ce9ea4ef14fe31e115b7"
+    },
     "com.unity.ai.navigation": {
       "version": "2.0.10",
       "depth": 0,
@@ -55,7 +62,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.26",
+      "version": "2.0.27",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -90,6 +97,13 @@
     "com.unity.nuget.mono-cecil": {
       "version": "1.11.6",
       "depth": 3,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.2.2",
+      "depth": 0,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
