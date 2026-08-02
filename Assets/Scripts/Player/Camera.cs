@@ -4,6 +4,7 @@ public class Camera : MonoBehaviour
 {
     [SerializeField] Transform playerRoot;
     [SerializeField] float mouseSensitivity = 0.5f;
+    [SerializeField] Vector2 minMaxVerticalLook = new(90f, 270f);
     bool isMouseLocked = false;
     float zoom = 0f;
 
@@ -11,19 +12,27 @@ public class Camera : MonoBehaviour
     {
         Vector2 lookMovement = PlayerMovement.PlayerInput.Player.Look.ReadValue<Vector2>();
 
-        Vector3 rotation;
-        if (isMouseLocked || zoom == 0)
-            rotation = playerRoot.rotation.eulerAngles;
-        else
-            rotation = transform.rotation.eulerAngles;
+        Vector3 cameraRotation = transform.rotation.eulerAngles;
+        Vector3 rootRotation = playerRoot.rotation.eulerAngles;
 
-        rotation.x -= lookMovement.y * mouseSensitivity;
-        rotation.y += lookMovement.x * mouseSensitivity;
-        rotation.z = 0;
+        if (cameraRotation.x > 180f)
+            cameraRotation.x -= 360f;
+        cameraRotation.x -= lookMovement.y * mouseSensitivity;
+        cameraRotation.x = Mathf.Clamp(cameraRotation.x, minMaxVerticalLook.x, minMaxVerticalLook.y);
+        print(cameraRotation.x);
 
-        if (isMouseLocked || zoom == 0)
-            playerRoot.rotation = Quaternion.Euler(rotation);
+        if (ShouldRotateRoot())
+            rootRotation.y += lookMovement.x * mouseSensitivity;
         else
-            transform.rotation = Quaternion.Euler(rotation);
+            cameraRotation.y += lookMovement.x * mouseSensitivity;
+
+
+        transform.rotation = Quaternion.Euler(cameraRotation);
+        playerRoot.rotation = Quaternion.Euler(rootRotation);
+    }
+
+    bool ShouldRotateRoot()
+    {
+        return isMouseLocked || zoom == 0;
     }
 }
