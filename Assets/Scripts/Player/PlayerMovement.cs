@@ -36,12 +36,14 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        Vector3 velocity = new(movementInput.x, rigidbody.linearVelocity.y, movementInput.y);
-        velocity *= speed;
-        if (isSprinting)
-            velocity *= sprintSpeedMultiplier;
+        Vector3 moveDirection = (transform.forward * movementInput.y) + (transform.right * movementInput.x);
+        moveDirection = moveDirection.normalized;
 
-        rigidbody.linearVelocity = velocity;
+        moveDirection *= speed;
+        if (isSprinting)
+            moveDirection *= sprintSpeedMultiplier;
+
+        rigidbody.linearVelocity = new(moveDirection.x, rigidbody.linearVelocity.y, moveDirection.z);
     }
 
     void Update()

@@ -4,7 +4,7 @@ public class Camera : MonoBehaviour
 {
     [SerializeField] Transform playerRoot;
     [SerializeField] float mouseSensitivity = 0.5f;
-    [SerializeField] Vector2 minMaxVerticalLook = new(90f, 270f);
+    [SerializeField] Vector2 minMaxVerticalLook = new(-90f, 90f);
     bool isMouseLocked = false;
     float zoom = 0f;
 
@@ -19,7 +19,6 @@ public class Camera : MonoBehaviour
             cameraRotation.x -= 360f;
         cameraRotation.x -= lookMovement.y * mouseSensitivity;
         cameraRotation.x = Mathf.Clamp(cameraRotation.x, minMaxVerticalLook.x, minMaxVerticalLook.y);
-        print(cameraRotation.x);
 
         if (ShouldRotateRoot())
             rootRotation.y += lookMovement.x * mouseSensitivity;
