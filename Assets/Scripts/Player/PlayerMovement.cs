@@ -36,6 +36,11 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        UpdateVelocity();
+    }
+
+    void UpdateVelocity()
+    {
         Vector3 moveDirection = (transform.forward * movementInput.y) + (transform.right * movementInput.x);
         moveDirection = moveDirection.normalized;
 
