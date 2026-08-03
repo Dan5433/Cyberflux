@@ -19,8 +19,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] Vector3 mouseLockCamOffset;
     [SerializeField] GameObject mouseLockIcon;
 
+    [SerializeField] float jumpStrength = 5f;
+
     bool isSprinting = false;
     bool isMouseLocked = false;
+    bool isJumping = false;
     Vector2 movementInput;
 
     new Rigidbody rigidbody;
@@ -29,22 +32,19 @@ public class PlayerMovement : MonoBehaviour
     {
         rigidbody = GetComponent<Rigidbody>();
 
+
         playerInput = new();
+
         playerInput.Player.Sprint.started += _ => isSprinting = true;
         playerInput.Player.Sprint.canceled += _ => isSprinting = false;
+
         playerInput.Player.MouseLock.performed += ToggleMouseLock;
 
+        playerInput.Player.Jump.started += _ => isJumping = true;
+        playerInput.Player.Jump.canceled += _ => isJumping = false;
+
+
         Cursor.lockState = CursorLockMode.Confined;
-    }
-
-    void OnEnable()
-    {
-        playerInput.Enable();
-    }
-
-    void OnDisable()
-    {
-        playerInput.Disable();
     }
 
     void FixedUpdate()
@@ -58,6 +58,19 @@ public class PlayerMovement : MonoBehaviour
     {
         movementInput = playerInput.Player.Move.ReadValue<Vector2>();
         limbAnimation.UpdateAnimations(movementInput, isSprinting);
+
+        JumpUpdate();
+    }
+
+    void JumpUpdate()
+    {
+        const float jumpRaycastDistance = 0.05f;
+        Vector3 verticalOffset = new(0, 0.025f, 0);
+
+        if (!Physics.Raycast(transform.position + verticalOffset, Vector3.down, jumpRaycastDistance) || !isJumping)
+            return;
+
+        rigidbody.linearVelocity = new(rigidbody.linearVelocity.x, jumpStrength, rigidbody.linearVelocity.z);
     }
 
     void UpdateVelocity()
@@ -92,5 +105,15 @@ public class PlayerMovement : MonoBehaviour
         mouseLockIcon.SetActive(isMouseLocked);
         Cursor.lockState = isMouseLocked ? CursorLockMode.Locked : CursorLockMode.Confined;
         thirdPersonFollow.ShoulderOffset = isMouseLocked ? mouseLockCamOffset : Vector3.zero;
+    }
+
+    void OnEnable()
+    {
+        playerInput.Enable();
+    }
+
+    void OnDisable()
+    {
+        playerInput.Disable();
     }
 }
