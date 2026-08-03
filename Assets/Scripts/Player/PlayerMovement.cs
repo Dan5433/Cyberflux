@@ -10,7 +10,12 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float speed = 5f;
     [SerializeField] float sprintSpeedMultiplier = 1.5f;
     [SerializeField] LimbAnimation limbAnimation;
+
+    [SerializeField] Transform limbs, mainCamera, cameraPivot;
+    [SerializeField] float camRotationSnapSpeed = 1f;
+
     bool isSprinting = false;
+    bool isMouseLocked = false;
     Vector2 movementInput;
 
     new Rigidbody rigidbody;
@@ -22,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
         playerInput = new();
         playerInput.Player.Sprint.started += _ => isSprinting = true;
         playerInput.Player.Sprint.canceled += _ => isSprinting = false;
+        PlayerInput.Player.MouseLock.performed += _ => isMouseLocked = !isMouseLocked;
     }
 
     void OnEnable()
@@ -37,18 +43,32 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         UpdateVelocity();
+
+        if (isMouseLocked)
+            limbs.rotation = Quaternion.Euler(0, mainCamera.eulerAngles.y, 0);
     }
 
     void UpdateVelocity()
     {
-        Vector3 moveDirection = (transform.forward * movementInput.y) + (transform.right * movementInput.x);
-        moveDirection = moveDirection.normalized;
+        Vector3 moveDirection = (mainCamera.forward * movementInput.y) + (mainCamera.right * movementInput.x);
+        moveDirection.Normalize();
 
-        moveDirection *= speed;
+        if (moveDirection.magnitude > 0)
+            RotateBodyToCamera(moveDirection);
+
+        Vector3 velocity = moveDirection * speed;
         if (isSprinting)
-            moveDirection *= sprintSpeedMultiplier;
+            velocity *= sprintSpeedMultiplier;
 
-        rigidbody.linearVelocity = new(moveDirection.x, rigidbody.linearVelocity.y, moveDirection.z);
+        rigidbody.linearVelocity = new(velocity.x, rigidbody.linearVelocity.y, velocity.z);
+    }
+
+    void RotateBodyToCamera(Vector3 moveDirection)
+    {
+        moveDirection.y = 0;
+        Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+
+        limbs.rotation = Quaternion.Slerp(limbs.rotation, targetRotation, camRotationSnapSpeed);
     }
 
     void Update()

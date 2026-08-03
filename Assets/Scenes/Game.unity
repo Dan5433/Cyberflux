@@ -546,6 +546,9 @@ MonoBehaviour:
   speed: 1.5
   sprintSpeedMultiplier: 1.5
   limbAnimation: {fileID: 524469205}
+  limbs: {fileID: 524469203}
+  mainCamera: {fileID: 330585546}
+  camRotationSnapSpeed: 0.25
 --- !u!136 &207292211
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1319,7 +1322,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Camera
   thirdPersonFollow: {fileID: 1927903786}
   playerRoot: {fileID: 207292207}
-  head: {fileID: 1394546171}
   mouseSensitivity: 0.3
   zoomSensitivity: 0.25
   minMaxVerticalLook: {x: -90, y: 75}

@@ -9,7 +9,6 @@ public class CameraControls : MonoBehaviour
     [SerializeField] float zoomSensitivity = 0.25f;
     [SerializeField] Vector2 minMaxVerticalLook = new(-90f, 90f);
     [SerializeField] float maxCameraDistance = 10f;
-    bool isMouseLocked = false;
     float cameraDistance = 0f;
 
     void Update()
@@ -31,7 +30,7 @@ public class CameraControls : MonoBehaviour
         cameraRotation.x = Mathf.Clamp(cameraRotation.x, minMaxVerticalLook.x, minMaxVerticalLook.y);
 
 
-        if (ShouldRotateRoot())
+        if (cameraDistance == 0)
         {
             rootRotation.y += lookMovement.x * mouseSensitivity;
             cameraRotation.y = 0;
@@ -51,10 +50,5 @@ public class CameraControls : MonoBehaviour
         cameraDistance = Mathf.Clamp(cameraDistance, 0, maxCameraDistance);
 
         thirdPersonFollow.CameraDistance = cameraDistance;
-    }
-
-    bool ShouldRotateRoot()
-    {
-        return isMouseLocked || cameraDistance == 0;
     }
 }
