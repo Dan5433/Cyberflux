@@ -1,4 +1,5 @@
 using InputSystem;
+using Unity.Cinemachine;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -14,6 +15,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] Transform limbs, mainCamera, cameraPivot;
     [SerializeField] float camRotationSnapSpeed = 1f;
 
+    [SerializeField] CinemachineThirdPersonFollow thirdPersonFollow;
+    [SerializeField] Vector3 mouseLockCamOffset;
+    [SerializeField] GameObject mouseLockIcon;
+
     bool isSprinting = false;
     bool isMouseLocked = false;
     Vector2 movementInput;
@@ -27,7 +32,9 @@ public class PlayerMovement : MonoBehaviour
         playerInput = new();
         playerInput.Player.Sprint.started += _ => isSprinting = true;
         playerInput.Player.Sprint.canceled += _ => isSprinting = false;
-        PlayerInput.Player.MouseLock.performed += _ => isMouseLocked = !isMouseLocked;
+        playerInput.Player.MouseLock.performed += ToggleMouseLock;
+
+        Cursor.lockState = CursorLockMode.Confined;
     }
 
     void OnEnable()
@@ -43,17 +50,21 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         UpdateVelocity();
-
         if (isMouseLocked)
             limbs.rotation = Quaternion.Euler(0, mainCamera.eulerAngles.y, 0);
+    }
+
+    void Update()
+    {
+        movementInput = playerInput.Player.Move.ReadValue<Vector2>();
+        limbAnimation.UpdateAnimations(movementInput, isSprinting);
     }
 
     void UpdateVelocity()
     {
         Vector3 forwardDirection = new(mainCamera.forward.x, 0, mainCamera.forward.z);
-        Vector3 rightDirection = new(mainCamera.right.x, mainCamera.right.y, 0);
 
-        Vector3 moveDirection = forwardDirection * movementInput.y + rightDirection * movementInput.x;
+        Vector3 moveDirection = forwardDirection * movementInput.y + mainCamera.right * movementInput.x;
         moveDirection.Normalize();
 
         if (moveDirection.magnitude > 0)
@@ -74,9 +85,12 @@ public class PlayerMovement : MonoBehaviour
         limbs.rotation = Quaternion.Slerp(limbs.rotation, targetRotation, camRotationSnapSpeed);
     }
 
-    void Update()
+    void ToggleMouseLock(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        movementInput = playerInput.Player.Move.ReadValue<Vector2>();
-        limbAnimation.UpdateAnimations(movementInput, isSprinting);
+        isMouseLocked = !isMouseLocked;
+
+        mouseLockIcon.SetActive(isMouseLocked);
+        Cursor.lockState = isMouseLocked ? CursorLockMode.Locked : CursorLockMode.Confined;
+        thirdPersonFollow.ShoulderOffset = isMouseLocked ? mouseLockCamOffset : Vector3.zero;
     }
 }
