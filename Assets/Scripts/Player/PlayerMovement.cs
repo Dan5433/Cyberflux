@@ -50,7 +50,10 @@ public class PlayerMovement : MonoBehaviour
 
     void UpdateVelocity()
     {
-        Vector3 moveDirection = (mainCamera.forward * movementInput.y) + (mainCamera.right * movementInput.x);
+        Vector3 forwardDirection = new(mainCamera.forward.x, 0, mainCamera.forward.z);
+        Vector3 rightDirection = new(mainCamera.right.x, mainCamera.right.y, 0);
+
+        Vector3 moveDirection = forwardDirection * movementInput.y + rightDirection * movementInput.x;
         moveDirection.Normalize();
 
         if (moveDirection.magnitude > 0)
