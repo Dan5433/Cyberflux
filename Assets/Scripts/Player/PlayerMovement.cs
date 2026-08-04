@@ -52,14 +52,14 @@ public class PlayerMovement : MonoBehaviour
         UpdateVelocity();
         if (isMouseLocked)
             limbs.rotation = Quaternion.Euler(0, mainCamera.eulerAngles.y, 0);
+
+        JumpUpdate();
     }
 
     void Update()
     {
         movementInput = playerInput.Player.Move.ReadValue<Vector2>();
         limbAnimation.UpdateAnimations(movementInput, isSprinting);
-
-        JumpUpdate();
     }
 
     void JumpUpdate()
