@@ -2,6 +2,7 @@ using InputSystem;
 using Unity.Cinemachine;
 using UnityEngine;
 
+[RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMovement : MonoBehaviour
 {
@@ -23,15 +24,17 @@ public class PlayerMovement : MonoBehaviour
 
     bool isSprinting = false;
     bool isMouseLocked = false;
-    bool isJumping = false;
+    bool isHoldingJumpKey = false;
+    bool onGround = false;
     Vector2 movementInput;
 
     new Rigidbody rigidbody;
+    new CapsuleCollider collider;
 
     void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
-
+        collider = GetComponent<CapsuleCollider>();
 
         playerInput = new();
 
@@ -40,8 +43,8 @@ public class PlayerMovement : MonoBehaviour
 
         playerInput.Player.MouseLock.performed += ToggleMouseLock;
 
-        playerInput.Player.Jump.started += _ => isJumping = true;
-        playerInput.Player.Jump.canceled += _ => isJumping = false;
+        playerInput.Player.Jump.started += _ => isHoldingJumpKey = true;
+        playerInput.Player.Jump.canceled += _ => isHoldingJumpKey = false;
 
 
         Cursor.lockState = CursorLockMode.Confined;
@@ -64,13 +67,11 @@ public class PlayerMovement : MonoBehaviour
 
     void JumpUpdate()
     {
-        const float jumpRaycastDistance = 0.05f;
-        Vector3 verticalOffset = new(0, 0.025f, 0);
+        int layerMask = 1; //default layer
+        onGround = Physics.CheckSphere(transform.position + new Vector3(0, collider.radius, 0), collider.radius, layerMask);
 
-        if (!Physics.Raycast(transform.position + verticalOffset, Vector3.down, jumpRaycastDistance) || !isJumping)
-            return;
-
-        rigidbody.linearVelocity = new(rigidbody.linearVelocity.x, jumpStrength, rigidbody.linearVelocity.z);
+        if (onGround && isHoldingJumpKey)
+            rigidbody.linearVelocity = new(rigidbody.linearVelocity.x, jumpStrength, rigidbody.linearVelocity.z);
     }
 
     void UpdateVelocity()
@@ -123,5 +124,14 @@ public class PlayerMovement : MonoBehaviour
     void OnDisable()
     {
         playerInput.Disable();
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        if (!collider)
+            collider = GetComponent<CapsuleCollider>();
+
+        Gizmos.color = Color.limeGreen;
+        Gizmos.DrawSphere(transform.position + new Vector3(0, collider.radius, 0), collider.radius);
     }
 }
