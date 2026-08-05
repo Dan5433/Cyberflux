@@ -107,6 +107,14 @@ public class PlayerMovement : MonoBehaviour
         thirdPersonFollow.ShoulderOffset = isMouseLocked ? mouseLockCamOffset : Vector3.zero;
     }
 
+    public void MatchCameraRotation()
+    {
+        float cameraRotationY = cameraPivot.rotation.eulerAngles.y;
+        transform.rotation = Quaternion.Euler(0, cameraRotationY, 0);
+
+        limbs.localRotation = Quaternion.identity;
+    }
+
     void OnEnable()
     {
         playerInput.Enable();

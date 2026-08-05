@@ -5,6 +5,7 @@ public class CameraControls : MonoBehaviour
 {
     [SerializeField] CinemachineThirdPersonFollow thirdPersonFollow;
     [SerializeField] Transform playerRoot;
+    [SerializeField] PlayerMovement playerMovement;
     [SerializeField] float mouseSensitivity = 0.5f;
     [SerializeField] float zoomSensitivity = 0.25f;
     [SerializeField] Vector2 minMaxVerticalLook = new(-90f, 90f);
@@ -44,11 +45,15 @@ public class CameraControls : MonoBehaviour
 
     void UpdateZoom()
     {
+        float previousDistance = cameraDistance;
         Vector2 scrollInput = PlayerMovement.PlayerInput.Player.Zoom.ReadValue<Vector2>();
 
         cameraDistance -= scrollInput.y * zoomSensitivity;
         cameraDistance = Mathf.Clamp(cameraDistance, 0, maxCameraDistance);
 
         thirdPersonFollow.CameraDistance = cameraDistance;
+
+        if (previousDistance > 0 && cameraDistance <= 0)
+            playerMovement.MatchCameraRotation();
     }
 }
