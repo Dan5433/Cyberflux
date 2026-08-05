@@ -62,7 +62,7 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         movementInput = playerInput.Player.Move.ReadValue<Vector2>();
-        limbAnimation.UpdateAnimations(movementInput, isSprinting);
+        limbAnimation.UpdateAnimations(movementInput, isSprinting, onGround);
     }
 
     void JumpUpdate()
